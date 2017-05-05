@@ -1,10 +1,13 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using WebApp_Speedforce.Models;
 
 namespace WebApp_Speedforce.Controllers
 {
@@ -37,7 +40,7 @@ namespace WebApp_Speedforce.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> LoginPost(Models.UserLoginViewModel model)
+        public async Task<ActionResult> LoginPost(UserLoginViewModel model)
         {
             // URL to Speedforce API
             string url = "http://speedforceservice.azurewebsites.net/api/users/loginA";
@@ -53,7 +56,8 @@ namespace WebApp_Speedforce.Controllers
                 model.Username = "N/A";
             if (model.Password == null)
                 model.Password = "N/A";
-            model.Role = "Atleta";
+            model.Role = "Entrenador";
+            //model.Role = "Atleta";
 
             // Building JSON to send
             json["Username"] = model.Username;
@@ -81,8 +85,123 @@ namespace WebApp_Speedforce.Controllers
                 return Content("Problemas conectando con Speedforce API.");
             }
 
+            var user = JObject.Parse(responseJson);
+
             // If transaction is successful
-            return Content(responseJson, "application/json");
+            // return Content(user["Username"].ToString());
+
+            return RedirectToAction("Athletes", "Home", new { username = user["Username"].ToString() });
+        }
+
+        public async Task<ActionResult> Athletes(string username)
+        {
+            // URL to Speedforce API
+            string url = "http://speedforceservice.azurewebsites.net/api/users/athleteList/" + username;
+
+            // Athletes JSON Array from API
+            string responseJsonArray = "N/A";
+
+            // HTTP transaction
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    using (HttpResponseMessage response = await client.GetAsync(url))
+                    {
+                        using (HttpContent content = response.Content)
+                        {
+                            responseJsonArray = await content.ReadAsStringAsync();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // If transaction fails
+                return Content("Problemas conectando con Speedforce API.");
+            }
+
+            // JSON Object to build
+            var jsonArray = JArray.Parse(responseJsonArray);
+            var list = new List<AthleteViewModel>();
+
+            foreach (var jsonToken in jsonArray)
+            {
+                list.Add(JsonConvert.DeserializeObject<AthleteViewModel>(jsonToken.ToString()));
+            }
+
+            // If transaction is successful
+            return View(new AthleteListViewModel(username, list));
+        }
+
+        public async Task<ActionResult> UnbindAthlete(string trainer, string athlete)
+        {
+            // URL to Speedforce API
+            string url = "http://speedforceservice.azurewebsites.net/api/users/removeA";
+
+            // Response String
+            string responseString = "N/A";
+
+            // JSON Object to build
+            var json = new JObject();
+            json["trainerid"] = trainer;
+            json["athleteid"] = athlete;
+
+            // HTTP transaction
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    using (HttpResponseMessage response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, "application/json")))
+                    {
+                        using (HttpContent content = response.Content)
+                        {
+                            responseString = await content.ReadAsStringAsync();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // If transaction fails
+                return Content("Problemas desconectando atleta en Speedforce API.");
+            }
+
+            // If transaction is successful
+            return RedirectToAction("Athletes", "Home", new { username = trainer });
+        }
+
+        public async Task<ActionResult> PairAthlete(string trainer, string athlete)
+        {
+            // URL to Speedforce API
+            string url = "http://speedforceservice.azurewebsites.net/api/users/" + trainer + "/" + athlete;
+
+            // Response String
+            string responseString = "N/A";
+
+            // HTTP transaction
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    using (HttpResponseMessage response = await client.GetAsync(url))
+                    {
+                        using (HttpContent content = response.Content)
+                        {
+                            responseString = await content.ReadAsStringAsync();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // If transaction fails
+                return Content("Problemas desconectando atleta en Speedforce API.");
+            }
+
+            // If transaction is successful
+            return RedirectToAction("Athletes", "Home", new { username = trainer });
         }
     }
 }
