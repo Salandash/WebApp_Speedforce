@@ -3,6 +3,24 @@
 @{
     ViewBag.Title = "Lista de Atletas";
 }
+<!-- INLINE FORM ELELEMNTS -->
+<div class="row mt">
+    <div class="col-lg-12">
+        <div class="content-panel">
+            <h4> Agregar Atleta</h4>
+            @using (Html.BeginForm("PairAthlete", "Home", FormMethod.Post, new { @class = "form-inline", role = "form", style = "margin-left:5px" }))
+            {
+                <div class="form-group">
+                    <label class="sr-only" for="exampleInputEmail2">Usuario del Atleta</label>
+                    @Html.TextBoxFor(m => m.Athlete, new { @class = "form-control", type = "text", id = "exampleInputEmail2", placeholder = "Usuario del Atleta" })
+                    @Html.HiddenFor(m => m.Trainer)
+                </div>
+                <button type="submit" class="btn btn-success"><i class="fa fa-plus"></i></button>
+            }
+        </div><!-- /form-panel -->
+    </div><!-- /col-lg-12 -->
+</div><!-- /row -->
+<!-- TABLE ELELEMNTS -->
 <div class="row mt">
     <div class="col-md-12">
         <div class="content-panel">

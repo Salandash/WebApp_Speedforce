@@ -51,7 +51,14 @@ namespace WebApp_Speedforce.Models
             AthleteList = list;
         }
 
+        public AthleteListViewModel() { }
+
+        [Display(Name = "Trainer")]
         public string Trainer { get; set; }
+
+        [Display(Name = "Athlete")]
+        public string Athlete { get; set; }
+
         public List<AthleteViewModel> AthleteList { get; set; }
     }
 }

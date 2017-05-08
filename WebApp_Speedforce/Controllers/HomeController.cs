@@ -172,20 +172,27 @@ namespace WebApp_Speedforce.Controllers
             return RedirectToAction("Athletes", "Home", new { username = trainer });
         }
 
-        public async Task<ActionResult> PairAthlete(string trainer, string athlete)
+        [HttpPost]
+        public async Task<ActionResult> PairAthlete(AthleteListViewModel model)
         {
             // URL to Speedforce API
-            string url = "http://speedforceservice.azurewebsites.net/api/users/" + trainer + "/" + athlete;
+            string url = "http://speedforceservice.azurewebsites.net/api/users/trainer/athlete";
 
             // Response String
             string responseString = "N/A";
+
+            // JSON Object to build
+            var json = new JObject();
+            json["trainerid"] = model.Trainer;
+            json["athleteid"] = model.Athlete;
 
             // HTTP transaction
             try
             {
                 using (var client = new HttpClient())
                 {
-                    using (HttpResponseMessage response = await client.GetAsync(url))
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    using (HttpResponseMessage response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, "application/json")))
                     {
                         using (HttpContent content = response.Content)
                         {
@@ -197,11 +204,11 @@ namespace WebApp_Speedforce.Controllers
             catch
             {
                 // If transaction fails
-                return Content("Problemas desconectando atleta en Speedforce API.");
+                return Content("Problemas vinculando atleta en Speedforce API.");
             }
 
             // If transaction is successful
-            return RedirectToAction("Athletes", "Home", new { username = trainer });
+            return RedirectToAction("Athletes", "Home", new { username = model.Trainer });
         }
     }
 }
