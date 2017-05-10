@@ -49,8 +49,7 @@
                             <td>@item.BikerType</td>
                             <td>
                                 <button class="btn btn-primary btn-xs"><i class="fa fa-eye"></i></button>
-                                <button class="btn btn-danger btn-xs"><i class="fa fa-trash-o "></i></button>
-                                <input type="button" class="btn btn-danger btn-xs" value="D" onclick="location.href='@Url.Action("UnbindAthlete", "Home", new { trainer = Model.Trainer, athlete = item.Username })'" />
+                                <button class="btn btn-danger btn-xs" onclick="location.href='@Url.Action("UnbindAthlete", "Home", new { trainer = Model.Trainer, athlete = item.Username })'"><i class="fa fa-trash-o"></i></button>
                             </td>
                         </tr>
                     }

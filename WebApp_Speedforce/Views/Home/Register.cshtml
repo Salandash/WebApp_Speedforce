@@ -1,0 +1,163 @@
+﻿@using WebApp_Speedforce.Models
+@model TrainerRegisterViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Dashboard">
+    <meta name="keyword" content="Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
+
+    <title>@ViewBag.Title - Speedforce</title>
+    @{
+        Layout = null;
+    }
+    <!-- Bootstrap core CSS -->
+    <link href="~/Content/css/bootstrap.css" rel="stylesheet">
+    <!--external css-->
+    <link href="~/Content/css/font-awesome.css" rel="stylesheet" />
+
+    <!-- Custom styles for this template -->
+    <link href="~/Content/css/style.css" rel="stylesheet">
+    <link href="~/Content/css/style-responsive.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- **********************************************************************************************************************************************************
+    MAIN CONTENT
+    *********************************************************************************************************************************************************** -->
+
+    <div id="login-page">
+        <div class="container">
+
+            @{
+                List<SelectListItem> genderItems = new List<SelectListItem>();
+                genderItems.Add(new SelectListItem { Text = "Masculino", Value = "Masculino", Selected = true });
+                genderItems.Add(new SelectListItem { Text = "Femenino", Value = "Femenino" });
+
+                List<SelectListItem> countryItems = new List<SelectListItem>();
+                foreach (var item in Model.Countries)
+                {
+                    countryItems.Add(new SelectListItem { Text = item, Value = item });
+                }
+            }
+
+            @using (Html.BeginForm("RegisterPost", "Home", FormMethod.Post, new { @class = "form-login" }))
+            {
+                <h2 class="form-login-heading">Inicia Sesión</h2>
+                <div class="login-wrap">
+                    <br />
+                    <span>Email:</span>
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email", placeholder = "micorreo@miproveedor.com", autofocus = "autofocus" })
+                    <br />
+                    <span>Nombre:</span>
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control", type = "text", placeholder = "Nombre" })
+                    <br>
+                    <span>Apellido:</span>
+                    @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", type = "text", placeholder = "Apellido" })
+                    <br>
+                    <span>Fecha de Nacimiento:</span>
+                    @Html.TextBoxFor(m => m.BirthDate, new { @class = "form-control", type = "date", placeholder = "Fecha Nacimiento" })
+                    <br>
+                    <span>Sexo:</span>
+                    @*<div class="dropdown">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown" style="width: 100%">
+                                Género
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                                <li role="presentation"><a role="menuitem" tabindex="-1">Masculino</a></li>
+                                <li role="presentation" class="divider"></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Femenino</a></li>
+                            </ul>
+                        </div>*@
+                    <div class="dropdown">
+                        @Html.DropDownListFor(m => m.Sex, genderItems, "Género", new { @class = "btn btn-default dropdown-toggle", id = "menu1", style = "width: 100%" })
+                    </div>
+                    <br>
+                    <span>Número de Teléfono:</span>
+                    @Html.TextBoxFor(m => m.TelephoneNumber, new { @class = "form-control", type = "tel", placeholder = "000-000-0000" })
+                    <br>
+                    <span>País:</span>
+                    @*<div class="dropdown">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown" style="width: 100%">
+                                País
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                                <li role="presentation"><a role="menuitem" tabindex="-1">Masculino</a></li>
+                                <li role="presentation" class="divider"></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Femenino</a></li>
+                            </ul>
+                        </div>*@
+                    <div class="dropdown">
+                        @Html.DropDownListFor(m => m.CountryName, countryItems, "País", new { @class = "btn btn-default dropdown-toggle", id = "menu1", style = "width: 100%" })
+                    </div>
+                    <br>
+                    <span>Ciudad:</span>
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown" style="width: 100%">
+                            Ciudad
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                            <li role="presentation"><a role="menuitem" tabindex="-1">Masculino</a></li>
+                            <li role="presentation" class="divider"></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Femenino</a></li>
+                        </ul>
+                    </div>
+                    <br />
+                    <span>Usuario:</span>
+                    @Html.TextBoxFor(m => m.Username, new { @class = "form-control", type = "text", placeholder = "Nombre de Usuario" })
+                    <br>
+                    <span>Clave de Acceso:</span>
+                    @Html.TextBoxFor(m => m.Password, new { @class = "form-control", type = "password", placeholder = "Contraseña" })
+                    <br>
+                    <button class="btn btn-danger btn-block" href="index.html" type="submit"><i class="fa fa-lock"></i> REGISTRATE</button>
+                    <hr>
+
+                </div>
+
+                <!-- Modal -->
+                <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal" class="modal fade">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Forgot Password ?</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>Enter your e-mail address below to reset your password.</p>
+                                <input type="text" name="email" placeholder="Email" autocomplete="off" class="form-control placeholder-no-fix">
+
+                            </div>
+                            <div class="modal-footer">
+                                <button data-dismiss="modal" class="btn btn-default" type="button">Cancel</button>
+                                <button class="btn btn-theme" type="button">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- modal -->
+            }
+        </div>
+    </div>
+
+    <!-- js placed at the end of the document so the pages load faster -->
+    <script src="~/Content/js/jquery.js"></script>
+    <script src="~/Content/js/bootstrap.min.js"></script>
+
+    <!--BACKSTRETCH-->
+    <!-- You can use an image of whatever size. This script will stretch to fit in any screen size.-->
+    <script type="text/javascript" src="~/Content/js/jquery.backstretch.min.js"></script>
+    <script>
+        $.backstretch("../../Content/img/login-bg.jpg", { speed: 500 });
+    </script>
+
+
+
+</body>
+</html>

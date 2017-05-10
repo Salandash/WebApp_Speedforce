@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 using WebApp_Speedforce.Models;
 
@@ -31,6 +30,8 @@ namespace WebApp_Speedforce.Controllers
 
             return View();
         }
+
+        #region Login
 
         public ActionResult Login()
         {
@@ -92,6 +93,134 @@ namespace WebApp_Speedforce.Controllers
 
             return RedirectToAction("Athletes", "Home", new { username = user["Username"].ToString() });
         }
+
+        #endregion
+
+        #region Register
+
+        public async Task<ActionResult> Register()
+        {
+            // URL to Speedforce API
+            string url = "http://speedforceservice.azurewebsites.net/api/values/countries";
+
+            // Countries JSON Array from API
+            string responseJsonArray = "N/A";
+
+            // HTTP transaction
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    using (HttpResponseMessage response = await client.GetAsync(url))
+                    {
+                        using (HttpContent content = response.Content)
+                        {
+                            responseJsonArray = await content.ReadAsStringAsync();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // If transaction fails
+                return Content("Problemas conectando con Speedforce API.");
+            }
+
+            // JSON Object to build
+            var jsonArray = JArray.Parse(responseJsonArray);
+            var list = new List<string>();
+
+            foreach (var jsonToken in jsonArray)
+            {
+                list.Add(jsonToken.ToString());
+            }
+
+            // If transaction is successful
+            return View(new TrainerRegisterViewModel(list));
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> RegisterPost(TrainerRegisterViewModel model)
+        {
+            // URL to Speedforce API
+            string url = "http://speedforceservice.azurewebsites.net/api/users/registerT";
+
+            // JSON Response to Display
+            string responseJson = "N/A";
+
+            // JSON Object to build
+            var json = new JObject();
+
+            // Verifying model
+            if (model.Username == null)
+                model.Username = "N/A";
+            if (model.Password == null)
+                model.Password = "N/A";
+            if (model.Email == null)
+                model.Email = "N/A";
+            if (model.Name == null)
+                model.Name = "N/A";
+            if (model.LastName == null)
+                model.LastName = "N/A";
+            if (model.Sex == null)
+                model.Sex = "N/A";
+            if (model.BirthDate == null)
+                model.BirthDate = "N/A";
+            if (model.CityName == null)
+                model.CityName = "N/A";
+            if (model.CountryName == null)
+                model.CountryName = "N/A";
+            if (model.TelephoneNumber == null)
+                model.TelephoneNumber = "N/A";
+            model.Role = "Entrenador";
+            model.Certified = true;
+
+            // Building JSON to send
+            json["Username"] = model.Username;
+            json["Password"] = model.Password;
+            json["Role"] = model.Role;
+            json["Email"] = model.Email;
+            json["Name"] = model.Name;
+            json["LastName"] = model.LastName;
+            json["Sex"] = model.Sex;
+            json["BirthDate"] = model.BirthDate;
+            json["CityName"] = model.CityName;
+            json["CountryName"] = model.CountryName;
+            json["TelephoneNumber"] = model.TelephoneNumber;
+            json["Certified"] = model.Certified;
+
+            return Content(json.ToString(), "application/json");
+
+            // HTTP transaction
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    using (HttpResponseMessage response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, "application/json")))
+                    {
+                        using (HttpContent content = response.Content)
+                        {
+                            responseJson = await content.ReadAsStringAsync();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // If transaction fails
+                return Content("Problemas conectando con Speedforce API.");
+            }
+
+            var user = JObject.Parse(responseJson);
+
+            // If transaction is successful
+            return RedirectToAction("Athletes", "Home", new { username = user["Username"].ToString() });
+        }
+
+        #endregion
+
+        #region Athletes
 
         public async Task<ActionResult> Athletes(string username)
         {
@@ -210,5 +339,7 @@ namespace WebApp_Speedforce.Controllers
             // If transaction is successful
             return RedirectToAction("Athletes", "Home", new { username = model.Trainer });
         }
+
+        #endregion
     }
 }

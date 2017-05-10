@@ -41,7 +41,9 @@
                     <br>
                     @Html.TextBoxFor(m => m.Password, new { @class = "form-control", type = "password", placeholder = "Contraseña" })
                     <br>
-                    <button class="btn btn-warning btn-block" type="submit"><i class="fa fa-lock"></i> ENTRAR</button>
+                    <button class="btn btn-warning btn-block" href="index.html" type="submit"><i class="fa fa-sign-in"></i> ENTRAR</button>
+                    <h5 style="text-align:center">¿No tienes cuenta?</h5>
+                    <button class="btn btn-danger btn-block" href="index.html" type="button" onclick="location.href='@Url.Action("Register", "Home")'"><i class="fa fa-lock"></i> REGISTRATE</button>
                     <hr>
                 </div>
 
